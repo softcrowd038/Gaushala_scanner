@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 
 String? validateUserId(BuildContext context, String? value) {
   if (value == null || value.isEmpty) {
-    showValidationErrorSnackbar(context, 'User ID cannot be empty');
-    return 'User ID cannot be empty';
+    showValidationErrorSnackbar(context, 'User email cannot be empty');
+    return 'User email cannot be empty';
   }
-
 
   if (value.length < 6) {
     showValidationErrorSnackbar(
-        context, 'User ID should be at least 6 characters');
-    return 'User ID should be at least 6 characters';
+        context, 'User email should be at least 6 characters');
+    return 'User email should be at least 6 characters';
   }
 
   return null;

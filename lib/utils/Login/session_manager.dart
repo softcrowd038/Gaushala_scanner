@@ -1,26 +1,27 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:gaushalascanner/pages/login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SessionManager extends ChangeNotifier {
-  late final SharedPreferences _prefs;
+  final SharedPreferences _prefs;
 
-  SessionManager(SharedPreferences prefs) : _prefs = prefs;
+  SessionManager(this._prefs);
 
-  Future<bool> isLoggedIn() async {
-    return _prefs.getBool("isLoggedIn") ?? false;
-  }
+  String? get authToken => _prefs.getString('auth_token');
 
-  void setLoggedIn(bool value) async {
-    await _prefs.setBool("isLoggedIn", value);
+  Future<void> saveAuthToken(String token) async {
+    await _prefs.setString('auth_token', token);
     notifyListeners();
   }
 
-  String? getVisitorId() {
-    return _prefs.getString("visitorId");
-  }
-
-  void setVisitorId(String visitorId) async {
-    await _prefs.setString("visitorId", visitorId);
+  Future<void> clearSession(BuildContext context) async {
+    await _prefs.remove('auth_token');
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LoginPage(),
+      ),
+    );
     notifyListeners();
   }
 }

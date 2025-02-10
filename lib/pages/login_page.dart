@@ -12,8 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
-  final bool isLoggedIn;
-  const LoginPage({super.key, required this.isLoggedIn});
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -35,15 +34,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> authenticateUser() async {
-    const String apiUrl =
-        'https://softcrowd.in/gaushala_management_system/login_api/login_api_visitor.php?visitor_id=&password=';
+    const String apiUrl = 'http://192.168.1.21:5001/api/visitor/login';
 
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'visitor_id': userIdController.text,
+          'email': userIdController.text,
           'password': passwordController.text,
         }),
       );
@@ -53,16 +51,20 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         print('Authentication successful: ${response.body}');
 
-        context.read<SessionManager>().setLoggedIn(true);
-        context.read<SessionManager>().setVisitorId(userIdController.text);
+        final Map<String, dynamic> data = jsonDecode(response.body);
+
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        sharedPreferences.setString('visitorId', data['uuid']);
+        sharedPreferences.setString('password', passwordController.text);
+
+        Provider.of<SessionManager>(context, listen: false)
+            .saveAuthToken(data['token']);
 
         final result = await Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => ScannerPage(
-              visitorId: userIdController.text,
-              password: passwordController.text,
-            ),
+            builder: (context) => const ScannerPage(),
           ),
         );
 
@@ -81,7 +83,6 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (error) {
       print('${userIdController.text} ${passwordController.text}');
-
       print('Error: $error');
     }
   }
@@ -122,9 +123,9 @@ class _LoginPageState extends State<LoginPage> {
                       fontWeight: FontWeight.bold),
                 ),
                 CustomTextField(
-                  hintText: "Enter your Visitor Id here",
+                  hintText: "Enter your Visitor Email here",
                   fieldController: userIdController,
-                  type: TextInputType.text,
+                  type: TextInputType.emailAddress,
                   customValidator: (value) => validateUserId(context, value),
                   icon: const Icon(Icons.person),
                 ),
@@ -137,15 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ScannerPage(
-                          visitorId: userIdController.text,
-                          password: passwordController.text,
-                        ),
-                      ),
-                    );
+                    authenticateUser();
                   },
                   child: const CustomButton(
                     color: Colors.blue,
