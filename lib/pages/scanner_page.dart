@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gaushalascanner/Models/animal_model.dart';
+import 'package:gaushalascanner/data/app_data.dart';
 import 'package:gaushalascanner/utils/Login/session_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -91,9 +92,8 @@ class _ScannerPageState extends State<ScannerPage> {
       return;
     }
 
-    String apiUrl = isCheckedIn
-        ? "http://192.168.1.21:5001/api/time/check-out"
-        : "http://192.168.1.21:5001/api/time/check-in";
+    String apiUrl =
+        isCheckedIn ? "$baseUrl/time/check-out" : "$baseUrl/time/check-in";
 
     try {
       Map<String, dynamic> requestData = {
@@ -235,8 +235,7 @@ class _ScannerPageState extends State<ScannerPage> {
   }
 
   Future<void> fetchAnimalDetails(String qrCode) async {
-    final url =
-        Uri.parse('http://192.168.1.21:5001/api/animaldetails/byid/$qrCode');
+    final url = Uri.parse('$baseUrl/animaldetails/byid/$qrCode');
 
     try {
       final response = await http.get(url, headers: {
@@ -410,7 +409,7 @@ class _ScannerPageState extends State<ScannerPage> {
       return;
     }
 
-    final url = Uri.parse('http://192.168.1.21:5001/api/visitor/$uuid');
+    final url = Uri.parse('$baseUrl/visitor/$uuid');
 
     try {
       final response = await http.get(url, headers: {

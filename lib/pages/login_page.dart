@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'dart:convert';
+import 'package:gaushalascanner/data/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:gaushalascanner/pages/scanner_page.dart';
@@ -34,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> authenticateUser() async {
-    const String apiUrl = 'http://192.168.1.21:5001/api/visitor/login';
+    String apiUrl = '$baseUrl/visitor/login';
 
     try {
       final response = await http.post(
