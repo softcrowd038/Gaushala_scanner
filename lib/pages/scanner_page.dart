@@ -87,6 +87,8 @@ class _ScannerPageState extends State<ScannerPage> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final visitorId = sharedPreferences.getString('id');
 
+    print(visitorId);
+
     if (visitorId == null || visitorId.isEmpty) {
       _showErrorDialog("Visitor ID not found. Please try again.");
       return;
@@ -107,7 +109,7 @@ class _ScannerPageState extends State<ScannerPage> {
           'Content-Type': 'application/json',
         },
       );
-
+      print(response.statusCode);
       if (response.statusCode == 200) {
         Map<String, dynamic> data = json.decode(response.body);
         print(data['message']);

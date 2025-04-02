@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'dart:convert';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:gaushalascanner/data/app_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -36,6 +37,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> authenticateUser() async {
     String apiUrl = '$baseUrl/visitor/login';
+    print('entered');
 
     try {
       final response = await http.post(
@@ -58,6 +60,10 @@ class _LoginPageState extends State<LoginPage> {
             await SharedPreferences.getInstance();
         sharedPreferences.setString('visitorId', data['uuid']);
         sharedPreferences.setString('password', passwordController.text);
+
+        final jwt = JWT.verify(data['token'], SecretKey(secreteKey));
+        print(jwt.payload['id']);
+        sharedPreferences.setString('id', jwt.payload['id'].toString());
 
         Provider.of<SessionManager>(context, listen: false)
             .saveAuthToken(data['token']);
